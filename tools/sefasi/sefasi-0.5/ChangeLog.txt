@@ -1,0 +1,39 @@
+Version 0.5
+-----------
+- Changed project name from STING to MAPPING
+- Changed sample salt generation from random prime to random bits
+- Changed salt to 64 bit for C version of sefasi_sample, currently
+  down-casted to 32bit though, since we use murmur 32 bit
+
+Version 0.4
+-----------
+- The init_enc command now aborts if the input data is not a proper
+  set and contains duplicate elements
+- In each data_enc permutation duplicate elements are removed (a warning is
+  printed if this happens). This avoids a duplicate element probing attack.
+  Thanks to Ennan Zhai for pointing me to this problem.
+- Changed the size check for data_enc. Don't trust the .size file, but
+  count elements in file (and estimate min unsampled when sampling)
+
+Version 0.3
+-----------
+- All the test scripts have an optional parameter now that if set to any
+  value will cause the use of the faster C tools; there are no separate
+  fast-version scripts anymore
+- Changed -n command line switch of sefasi_set_intersect and
+  sefasi_capture_data to -N to make it consistent with -N switch of
+  sefasi_main.py (excuse the backwards incompatibility)
+- Improved README
+- Added LC_ALL=C to sort calls in sefasi_main.py and test scripts to enforce 
+  consistent sort order with different locale settings
+- Added test script for n-party intersection (without probing detection)
+- Added test script for sorting datasets
+
+Version 0.2
+-----------
+- Added missing test sub directory
+
+Version 0.1
+-----------
+- Initial version
+

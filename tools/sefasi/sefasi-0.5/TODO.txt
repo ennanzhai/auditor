@@ -1,0 +1,12 @@
+Parameter checking (currently exceptions are uncatched)
+Write man pages
+Only one test script that figures out sequence based on config
+Extend to get intersection set
+- All parties decrypt intersection
+- Need decryption tool 
+Performance improvements
+Use LibTomCrypt for C encryption (faster than OpenSSL)?
+C encrypt does generates mostly the same but some different
+cyphertexts. Is this because of the fast exponentiation function
+of openssl?
+Fast test file generation C tool?

@@ -1,0 +1,4 @@
+This tool has been made possible in part by an Australian Research Council (ARC)
+Linkage Project grant (project LP110100240) with APNIC Pty Ltd as partner
+organisation, for a project titled "Tools and models for measuring and predicting
+growth in internet addressing and routing complexity".

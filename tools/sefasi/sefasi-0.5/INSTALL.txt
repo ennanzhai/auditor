@@ -1,0 +1,116 @@
+SeFaSI version 0.5
+------------------
+
+$Id: INSTALL.txt 864 2014-05-14 02:30:59Z szander $
+
+
+REQUIREMENTS
+------------
+
+SeFaSI requires python. We tested SeFaSI with python 2.6 and 2.7. It may work
+with older python versions. SeFaSI requires the following non-standard
+python modules:
+
+blist (version 1.3.4 or higher)
+pycrypto (version 2.6 or higher)
+murmur (version 0.1.3 or higher)
+
+The setup script should automatically install these modules. However, in
+case this fails a manual installation is necessary. The modules can be
+downloaded here:
+
+blist: https://pypi.python.org/pypi/blist/
+pycrypto: https://www.dlitz.net/software/pycrypto/
+murmur: https://pypi.python.org/pypi/Murmur/
+
+SeFaSI also also needs the tools wc and sort. Both must be in the path.
+
+The python setup script requires that either the setuptools or the distutils
+module is installed. 
+
+NOTE: automatic installation of the Python dependencies only works with setuptools.
+If there is a warning "Unknown distribution option: 'install_requires'"
+you need to install the dependencies manually (or install setuptools from
+https://pypi.python.org/pypi/setuptools).
+
+For a number of the tools we also implemented faster versions in C, but some
+of the tools including the main script exist only as python implementation.
+Installing the C versions of the tools requires the GNU autotools and
+the following libraries:
+
+libcrypto (openssl crypto library version 0.9.8 or higher)
+
+
+INSTALLATION
+------------
+
+Download the latest version from http://caia.swin.edu.au/mapping/tools .
+
+Unpack the tar archive, e.g. for version 0.1:
+$ tar -xvzf sefasi-0.1.tar.gz
+
+Install SeFaSI, e.g. for version 0.1:
+$ cd sefasi-0.1
+$ sefasi_install.sh <prefix>
+
+The script will install the SeFaSI python scripts and C tools. The default
+prefix (if prefix is not specified) is /usr/local. The python scripts
+and C tools can be installed separately as described below.
+
+Installation of python scripts (fully functional SeFaSI):
+
+$ python setup.py install
+
+By default the scripts in the src sub directory are installed in /usr/local/bin. The path can
+be changed by specifying a prefix. For example, the following command
+would install the scripts in /home/user/bin.
+
+$ python setup.py install --prefix=/home/user/ 
+
+For more information on setup options see "python setup.py --help" or
+http://docs.python.org/2/install/.
+
+The files in the test sub directory are not installed.
+
+Installation of the C tools:
+
+$ ./configure
+$ make
+$ make install
+
+By default the C tools are installed in /usr/local/bin. The path can
+be changed by specifying a prefix for the configure command as follows:
+
+$ ./configure --prefix=/home/user/
+
+NOTE: if your system has old versions of the autotools and fails during configure 
+or make the following commands will (hopefully) setup the make scripts correctly:
+
+$ aclocal
+$ autoheader
+$ automake
+$ autoconf
+
+
+RUNNING
+-------
+
+The test sub directory of the distribution contains test scripts that
+illustrate how SeFaSI can be used with two parties. They are described
+in more detail in README.txt.
+
+Also, README.txt contains some examples showing how to use SeFaSI.
+
+
+CONTACT
+-------
+
+If you have any questions or want to report any bugs please contact
+Sebastian Zander (szander@swin.edu.au).
+
+Centre for Advanced Internet Architectures
+Swinburne University of Technology
+Melbourne, Australia
+CRICOS number 00111D
+http://www.caia.swin.edu.au
+

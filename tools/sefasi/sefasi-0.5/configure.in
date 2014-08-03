@@ -1,0 +1,60 @@
+AC_INIT(sefasi, 0.5)
+AC_CONFIG_SRCDIR(csrc/sefasi_sample_items.cc)
+AC_CANONICAL_SYSTEM
+AM_INIT_AUTOMAKE([foreign])
+AC_CONFIG_HEADERS([config.h])
+
+
+AC_PROG_CC
+AC_PROG_CXX
+AC_SET_MAKE
+
+
+dnl # Platform 
+case "$target" in
+	*-linux*)
+        OS=LINUX
+	        AC_DEFINE(LINUX, 1, "Linux OS")
+		        ;;
+			*-sunos*)
+        OS=SUNOS
+	        AC_DEFINE(SUNOS, 1, "SUNOS")
+		        ;;
+			*-irix*)
+        OS=IRIX
+	        AC_DEFINE(IRIX, 1, "IRIX OS")
+		        ;;
+			*-solaris*)
+        OS=SOLARIS
+	        AC_DEFINE(SOLARIS, 1, "Solaris OS")
+		        ;;
+			*-freebsd*)
+        OS=FREEBSD
+	        AC_DEFINE(FREEBSD, 1, "FreeBSD OS")
+		        ;;
+			*dec-os*)
+        OS=ALPHA
+	        AC_DEFINE(ALPHA, 1, "Alpha")
+		        ;;
+			*)
+        OS=UNIX
+	        AC_DEFINE(UNIX, 1, "Unix")
+		        ;;
+esac
+
+dnl # Check for crypto 
+AC_CHECK_HEADERS([openssl/bn.h],,[AC_MSG_ERROR([cannot find libcrypto headers])])
+AC_CHECK_LIB(crypto, BN_dec2bn,
+  [CRYPTOLIB="-lcrypto"],
+  [AC_MSG_ERROR([cannot find libcrypto])])
+
+
+
+AC_SUBST(OS)
+AC_SUBST(CRYPTOLIB)
+
+AC_OUTPUT(Makefile \
+          src/Makefile \
+          csrc/Makefile \
+	  test/Makefile \
+         ) 
