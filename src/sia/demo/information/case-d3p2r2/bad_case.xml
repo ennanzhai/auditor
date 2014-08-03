@@ -1,0 +1,94 @@
+
+For bad case (i.e., including hidden common dependencies)
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+3 data centers, 2 power supplies, 2 Internet routers
+</configuration>
+<algorithm>
+naive algorithm
+</algorithm>
+<time>
+0.000735
+</time>
+<result>
+each data center's failure: 0.082544 (including powers and routers)
+rare event approximate: 0.000562414529245
+</result>
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+3 data centers, 2 power supplies, 2 Internet routers
+</configuration>
+<algorithm>
+minimal cut set algorithm
+</algorithm>
+<time>
+0.011133
+</time>
+<result>
+1. [Power-10000000001-0.15, Power-10000000002-0.15]:0.0225
+   importance:0.649375
+2. [Router-20000000001-0.111, Router-20000000002-0.111]:0.012321
+   importance:0.355598
+3. [DC-30000000001-0.047723, DC-30000000002-0.047723, 
+    DC-30000000003-0.047723]:0.000109
+   importance:0.003137 
+
+0.034649
+</result>
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+3 data centers, 2 power supplies, 2 Internet routers
+</configuration>
+<algorithm>
+Monte Carol algorithm (with 100,000 trials)
+</algorithm>
+<time>
+2.589908
+</time>
+<result>
+each data center's failure: 0.047723
+0.034653
+</result>
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+3 data centers, 2 power supplies, 2 Internet routers
+</configuration>
+<algorithm>
+Monte Carol algorithm (with 1,000,000 trials)
+</algorithm>
+<time>
+26.056761
+</time>
+<result>
+each data center's failure: 0.047723
+0.034646
+</result>
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+3 data centers, 2 power supplies, 2 Internet routers
+</configuration>
+<algorithm>
+Monte Carol algorithm (with 10,000,000 trials)
+</algorithm>
+<time>
+257.555855
+</time>
+<result>
+each data center's failure: 0.047723
+0.0346458
+</result>

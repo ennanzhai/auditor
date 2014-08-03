@@ -1,0 +1,10 @@
+<routing>
+    <path src="s2" dst="s3" rout="t1,a1,r1,a3,t2"/>
+    <path src="s2" dst="s3" rout="t1,a2,r1,a3,t2"/>
+    <path src="s2" dst="s3" rout="t1,a1,r2,a3,t2"/>
+    <path src="s2" dst="s3" rout="t1,a2,r2,a3,t2"/>
+    <path src="s2" dst="s3" rout="t1,a1,r1,a4,t2"/>
+    <path src="s2" dst="s3" rout="t1,a2,r1,a4,t2"/>
+    <path src="s2" dst="s3" rout="t1,a1,r2,a4,t2"/>
+    <path src="s2" dst="s3" rout="t1,a2,r2,a4,t2"/>
+</routing>

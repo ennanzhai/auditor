@@ -1,0 +1,9 @@
+<routing>
+    <path src="s1" dst="r1" rout="a1"/>
+    <path src="s1" dst="r1" rout="a2"/>
+    <path src="s2" dst="r1" rout="a2"/>
+    <path src="s2" dst="r1" rout="a3"/>
+    <path src="s2" dst="r2" rout="a3"/>
+    <path src="s3" dst="r1" rout="a4"/>
+    <path src="s3" dst="r2" rout="a5"/>
+</routing>

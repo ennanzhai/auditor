@@ -1,0 +1,103 @@
+
+For bad case (i.e., including hidden common dependencies)
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+5 data centers, 5 power supplies, 5 Internet routers
+</configuration>
+<algorithm>
+naive algorithm
+</algorithm>
+<time>
+0.001459
+</time>
+<result>
+rare event approximate: 2.49951985099e-07
+</result>
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+5 data centers, 5 power supplies, 5 Internet routers
+</configuration>
+<algorithm>
+minimal cut set algorithm
+</algorithm>
+<time>
+0.011133
+</time>
+<result>
+1. [Power-10000000001-0.15, 
+    Power-10000000002-0.15,
+    Power-10000000003-0.15,
+    Power-10000000004-0.15,
+    Power-10000000005-0.15] : 0.000076
+    importance : 0.816231
+
+2. [Router-20000000001-0.111, 
+    Router-20000000002-0.111,
+    Router-20000000003-0.111, 
+    Router-20000000004-0.111, 
+    Router-20000000005-0.111] : 0.000017
+    importance : 0.181122
+    
+3. [DC-30000000001-0.047723, 
+    DC-30000000002-0.047723, 
+    DC-30000000003-0.047723,
+    DC-30000000004-0.047723,
+    DC-30000000005-0.047723] : 2.47536179696e-07
+    importance : 0.002661
+
+0.000093034315
+</result>
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+5 data centers, 5 power supplies, 5 Internet routers
+</configuration>
+<algorithm>
+Monte Carol algorithm (with 100,000 trials)
+</algorithm>
+<time>
+3.809999
+</time>
+<result>
+0.000094
+</result>
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+5 data centers, 5 power supplies, 5 Internet routers
+</configuration>
+<algorithm>
+Monte Carol algorithm (with 1,000,000 trials)
+</algorithm>
+<time>
+39.245051
+</time>
+<result>
+0.000091
+</result>
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+5 data centers, 5 power supplies, 5 Internet routers
+</configuration>
+<algorithm>
+Monte Carol algorithm (with 10,000,000 trials)
+</algorithm>
+<time>
+388.427868
+</time>
+<result>
+0.00009286
+</result>

@@ -1,0 +1,17 @@
+<list>
+    <node id="service">
+        <gate>OR</gate>
+        <dep>fe</dep>
+        <dep>be</dep>
+    </node>
+    <node id="fe">
+        <gate>OR</gate>
+        <dep>fe-server</dep>
+        <dep>fe-comm</dep>
+    </node>
+    <node id="be">
+        <gate>OR</gate>
+        <dep>be-server</dep>
+        <dep>be-comm</dep>
+    </node>
+</list>

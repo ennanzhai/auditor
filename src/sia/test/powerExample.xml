@@ -1,0 +1,4 @@
+<routing>
+    <path src="dc1" dst="dc2" rout="c1,r1,c2"/>
+    <path src="dc1" dst="dc2" rout="c3,r2,c4"/>
+</routing>

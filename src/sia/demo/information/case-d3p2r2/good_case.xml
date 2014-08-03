@@ -1,0 +1,103 @@
+
+For good case (i.e., including hidden common dependencies)
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+3 data centers, 2 power supplies, 2 Internet routers
+</configuration>
+<algorithm>
+naive algorithm
+</algorithm>
+<time>
+0.000827
+</time>
+<result>
+each data center's failure: 0.082544 (including powers and routers)
+0.000523962270986
+0.000562414529245
+</result>
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+3 data centers, 2 power supplies, 2 Internet routers
+</configuration>
+<algorithm>
+minimal cut set algorithm
+</algorithm>
+<time>
+0.015378
+</time>
+<result>
+1. [DC-30000000001-0.047723, DC-30000000002-0.047723,
+    DC-30000000003-0.047723]:0.000109
+   importance: 0.193301
+2. [Power-10000000003-0.15, Power-10000000004-0.15
+    DC-30000000001-0.047723, DC-30000000003-0.047723]:0.000051
+   importance: 0.091137
+3. [Power-10000000001-0.15, Power-10000000002-0.15
+    DC-30000000002-0.047723, DC-30000000003-0.047723]:0.000051
+   importance: 0.091137
+4. [Power-10000000005-0.15, Power-10000000006-0.15
+    DC-30000000001-0.047723, DC-30000000002-0.047723]:0.000051
+   importance: 0.091137
+5. [DC-30000000001-0.047723, DC-30000000003-0.047723, 
+    Router-20000000003-0.111, Router-20000000004-0.111]:0.000028
+   importance: 0.049906
+
+0.000562260670043
+</result>
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+3 data centers, 2 power supplies, 2 Internet routers
+</configuration>
+<algorithm>
+Monte Carol algorithm (with 100,000 trials)
+</algorithm>
+<time>
+3.892576
+</time>
+<result>
+each data center's failure: 0.047723
+0.0005333
+</result>
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+3 data centers, 2 power supplies, 2 Internet routers
+</configuration>
+<algorithm>
+Monte Carol algorithm (with 1,000,000 trials)
+</algorithm>
+<time>
+37.462168
+</time>
+<result>
+each data center's failure: 0.047723
+0.00052625
+</result>
+
+<case>
+hidden correlated failures
+</case>
+<configuration>
+3 data centers, 2 power supplies, 2 Internet routers
+</configuration>
+<algorithm>
+Monte Carol algorithm (with 10,000,000 trials)
+</algorithm>
+<time>
+380.425479
+</time>
+<result>
+each data center's failure: 0.047723
+0.00052263
+</result>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<list>
+    <node id="service">
+        <gate>OR</gate>
+        <dep>fe</dep>
+        <dep>be</dep>
+    </node>
+    <node id="fe">
+        <gate>OR</gate>
+        <dep>fe-server</dep>
+        <dep>fe-comm</dep>
+    </node>
+    <node id="be">
+        <gate>OR</gate>
+        <dep>be-server</dep>
+        <dep>be-comm</dep>
+    </node>
+    <node id="fe-comm">
+        <gate>AND</gate>
+        <dep>path1</dep>
+        <dep>path2</dep>
+    </node>
+    <node id="path1">
+        <gate>OR</gate>
+        <dep>s1</dep>
+        <dep>a1</dep>
+        <dep>r1</dep>
+    </node>
+    <node id="path2">
+        <gate>OR</gate>
+        <dep>s1</dep>
+        <dep>a2</dep>
+        <dep>r1</dep>
+    </node>
+</list>

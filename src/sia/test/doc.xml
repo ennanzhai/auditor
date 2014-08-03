@@ -1,0 +1,19 @@
+<routing>
+    <path src="s1" dst="n1" rout="a1, r1"/>
+    <path src="s1" dst="n1" rout="a1, r2"/>
+    <path src="s1" dst="n1" rout="a2, r1"/>
+    <path src="s1" dst="n1" rout="a2, r2"/>
+    <path src="s2" dst="n1" rout="a3, r1"/>
+    <path src="s2" dst="n1" rout="a3, r2"/>
+    <path src="s2" dst="n1" rout="a4, r1"/>
+    <path src="s2" dst="n1" rout="a4, r2"/>
+
+    <path src="s3" dst="n1" rout="a5, r3"/>
+    <path src="s3" dst="n1" rout="a5, r4"/>
+    <path src="s3" dst="n1" rout="a6, r3"/>
+    <path src="s3" dst="n1" rout="a6, r4"/>
+    <path src="s4" dst="n1" rout="a7, r3"/>
+    <path src="s4" dst="n1" rout="a7, r4"/>
+    <path src="s4" dst="n1" rout="a8, r3"/>
+    <path src="s4" dst="n1" rout="a8, r4"/>
+</routing>

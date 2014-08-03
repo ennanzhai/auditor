@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<list>
+    <model number = WD7500BPKT>
+        <year>4</year>
+        <nonrecover>10^(-14)</nonrecover>
+        <limited>5</limited>
+        <cycles>600000</cycles>
+        <tem>60</tem>
+    </model>
+    <model number = WD5000BPKT>
+        <year>4</year>
+        <nonrecover>10^(-14)</nonrecover>
+        <limited>5</limited>
+        <cycles>600000</cycles>
+        <tem>60</tem>
+    </model>
+    <model number = WD3200BEKT>
+        <year>4</year>
+        <nonrecover>10^(-14)</nonrecover>
+        <limited>5</limited>
+        <cycles>600000</cycles>
+        <tem>60</tem>
+    </model>
+    <model number = WD2500BEKT>
+        <year>4</year>
+        <nonrecover>10^(-14)</nonrecover>
+        <limited>5</limited>
+        <cycles>600000</cycles>
+        <tem>60</tem>
+    </model>
+    <model number = WD1600BEKT>
+        <year>4</year>
+        <nonrecover>10^(-14)</nonrecover>
+        <limited>5</limited>
+        <cycles>600000</cycles>
+        <tem>60</tem>
+    </model>
+</list>

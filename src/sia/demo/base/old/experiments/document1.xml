@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<configuration>
+    <cloud>
+        <ID>1</ID>
+        <power>
+            <ID>10000000001</ID>
+            <failure>0.15</failure>
+            <type>Power Supply</type>
+        </power>
+        <power>
+            <ID>10000000002</ID>
+            <failure>0.15</failure>
+            <type>Power Supply</type>
+        </power>
+        <Internet>
+            <ID>20000000001</ID>
+            <failure>0.111</failure>
+            <type>Internet Router</type>
+        </Internet>
+        <Internet>
+            <ID>20000000002</ID>
+            <failure>0.111</failure>
+            <type>Internet Router</type>
+        </Internet>
+        <datacenter>
+            <ID>30000000001</ID>
+            <failure>0.047723</failure>
+            <type>Data Center</type>
+            <core>
+                <ID>40000000001</ID>
+                <failure>0.1</failure>
+                <type>Core Router</type>
+            </core>
+            <core>
+                <ID>40000000002</ID>
+                <failure>0.1</failure>
+                <type>Core Router</type>
+            </core>
+            <agg>
+                <ID>50000000001</ID>
+                <failure>0.111</failure>
+                <type>Aggregation Switch</type>
+                <dep>40000000001</dep>
+                <dep>40000000002</dep>
+            </agg>
+            <agg>
+                <ID>50000000002</ID>
+                <failure>0.111</failure>
+                <type>Aggregation Switch</type>
+                <dep>40000000001</dep>
+                <dep>40000000002</dep>
+            </agg>
+            <rack>
+                <ID>60000000001</ID>
+                <failure>0.055</failure>
+                <type>Rack</type>
+                <dep>50000000001</dep>
+                <dep>50000000002</dep>
+            </rack>
+            <rack>
+                <ID>60000000002</ID>
+                <failure>0.055</failure>
+                <type>Rack</type>
+                <dep>50000000001</dep>
+                <dep>50000000002</dep>
+            </rack>
+            <dep>10000000001</dep>
+            <dep>10000000002</dep>
+            <dep>20000000001</dep>
+            <dep>20000000002</dep>
+        </datacenter>
+        <datacenter>
+            <ID>30000000002</ID>
+            <failure>0.047723</failure>
+            <type>Data Center</type>
+            <core>
+                <ID>40000000001</ID>
+                <failure>0.1</failure>
+                <type>Core Router</type>
+            </core>
+            <core>
+                <ID>40000000002</ID>
+                <failure>0.1</failure>
+                <type>Core Router</type>
+            </core>
+            <agg>
+                <ID>50000000001</ID>
+                <failure>0.111</failure>
+                <type>Aggregation Switch</type>
+                <dep>40000000001</dep>
+                <dep>40000000002</dep>
+            </agg>
+            <agg>
+                <ID>50000000002</ID>
+                <failure>0.111</failure>
+                <type>Aggregation Switch</type>
+                <dep>40000000001</dep>
+                <dep>40000000002</dep>
+            </agg>
+            <rack>
+                <ID>60000000001</ID>
+                <failure>0.055</failure>
+                <type>Rack</type>
+                <dep>50000000001</dep>
+                <dep>50000000002</dep>
+            </rack>
+            <rack>
+                <ID>60000000002</ID>
+                <failure>0.055</failure>
+                <type>Rack</type>
+                <dep>50000000001</dep>
+                <dep>50000000002</dep>
+            </rack>
+            <dep>10000000001</dep>
+            <dep>10000000002</dep>
+            <dep>20000000001</dep>
+            <dep>20000000002</dep>
+        </datacenter>
+        <datacenter>
+            <ID>30000000003</ID>
+            <failure>0.047723</failure>
+            <type>Data Center</type>
+            <core>
+                <ID>40000000001</ID>
+                <failure>0.1</failure>
+                <type>Core Router</type>
+            </core>
+            <core>
+                <ID>40000000002</ID>
+                <failure>0.1</failure>
+                <type>Core Router</type>
+            </core>
+            <agg>
+                <ID>50000000001</ID>
+                <failure>0.111</failure>
+                <type>Aggregation Switch</type>
+                <dep>40000000001</dep>
+                <dep>40000000002</dep>
+            </agg>
+            <agg>
+                <ID>50000000002</ID>
+                <failure>0.111</failure>
+                <type>Aggregation Switch</type>
+                <dep>40000000001</dep>
+                <dep>40000000002</dep>
+            </agg>
+            <rack>
+                <ID>60000000001</ID>
+                <failure>0.055</failure>
+                <type>Rack</type>
+                <dep>50000000001</dep>
+                <dep>50000000002</dep>
+            </rack>
+            <rack>
+                <ID>60000000002</ID>
+                <failure>0.055</failure>
+                <type>Rack</type>
+                <dep>50000000001</dep>
+                <dep>50000000002</dep>
+            </rack>
+            <dep>10000000001</dep>
+            <dep>10000000002</dep>
+            <dep>20000000001</dep>
+            <dep>20000000002</dep>
+        </datacenter>
+    </cloud>
+</configuration>

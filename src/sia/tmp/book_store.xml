@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<book_store name="newhua" website="http://www.zhixing123.cn">
+	<book1>
+		<name>
+			hamlet
+		</name>
+		<author>
+			William Shakespeare
+		</author>
+	</book1>
+</book_store>
