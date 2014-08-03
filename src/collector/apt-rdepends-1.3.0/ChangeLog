@@ -1,0 +1,59 @@
+2005-09-21  Simon Law  <sfllaw@debian.org>
+
+	* apt-rdepends: Follow PreDepends as well as Depends, by default.
+
+	* apt-rdepends (print_factory): Split out all the output routines
+	into their own data structure.  Now output code isn't littered
+	throughout the programme, but is contained inside a modular hash.
+	(print_package, show_rdepends, main): Ibid.
+
+	* apt-rdepends (print_factory): Support VCG output.
+
+2004-01-23  Simon Law  <sfllaw@debian.org>
+
+	Support recursive Build-Dependencies:
+
+	* apt-rdepends (print_depcompareop): New function to display
+	AptPkg::Dep::DepCompareOp strings.
+
+	* apt-rdepends (file_builddepends): New function to find
+	Build-Depends.
+	(show_rdepends): Call it.
+	(POD): Document it.
+
+2004-01-22  Simon Law  <sfllaw@debian.org>
+
+	* apt-rdepends (print_version): Add version information.
+
+	* apt-rdepends (get_depends, print_package, file_depends): Split
+	functions from show_rdepends.
+	(show_rdepends): Ibid.
+
+	* apt-rdepends (POD): Add summary information.
+
+	* apt-rdepends: Revised copyright information and e-mail
+	addresses.
+
+2004-01-13  Simon Law  <sfllaw@debian.org>
+
+	* apt-rdepends (show_rdepends): Only show the requested
+	--state-show, even in --dotty mode.
+
+	* apt-rdepends (show_rdepends): Allow for arbitrary locales to
+	--*show and --*follow.  Also make these options case-insensitive.
+
+2002-08-18  Simon Law  <sfllaw@engmail.uwaterloo.ca>
+
+	* NEWS: Added this file, as we now have stuff to announce.
+	* apt-rdepends (show_rdepends): Added support for --print-state,
+	  --state-follow, and --state-show
+	* apt-rdepends (main): Now we use GNU getopt compatibility.
+
+2002-07-27  Simon Law  <sfllaw@ethiopia>
+
+	* COPYING, README: Added these files, as any good coder should.
+
+2002-07-14  Simon Law  <sfllaw@ethiopia>
+
+	* apt-rdepends: Initial Release
+

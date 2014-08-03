@@ -1,0 +1,694 @@
+#!/usr/bin/perl -w
+
+# apt-rdepends
+#
+# apt-rdepends performs recursive dependency listings similar to apt-cache.
+# Copyright (C) 2002-2005  Simon Law
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+use strict;
+
+use Getopt::Long qw(:config gnu_getopt);
+use Pod::Usage;
+
+my $version = "1.3.0";
+
+my $man = 0;
+my $help = 0;
+my $ver = 0;
+## Parse options and print usage if there is a syntax error,
+## or if usage was explicitly requested.
+
+# Choose the direction of our recursive dependencies
+my $reverse = 0;
+# Are we following Build-Depends?
+my $builddep = 0;
+# We kind of output do we generate?  (console, dotty, vcg)
+my $output = "console";
+# Which types of dependencies do we follow?
+my @follow = ();
+# Which types of dependencies do we show?
+my @show = ();
+
+# We don't print package states by default.
+my $printstate = 0;
+# Which states should I follow?
+my @statefollow = ();
+# Which states should I show?
+my @stateshow = ();
+
+# The object that knows how to display $output
+my $Print;
+
+GetOptions ('reverse|r'        => \$reverse,
+	    'build-depends|b'  => \$builddep,
+	    'dotty|d'	       => sub { $output = "dotty" },
+	    'vcg|xvcg|v'       => sub { $output = "vcg" },
+	    'follow|f=s'       => \@follow,
+	    'show|s=s'         => \@show,
+	    'print-state|p'    => \$printstate,
+	    'state-follow=s'   => \@statefollow,
+	    'state-show=s'     => \@stateshow,
+	    'help|h|?'         => \$help,
+	    'version'          => \$ver,
+	    'man'              => \$man) or pod2usage(verbose => 0);
+print_version() if ($ver);
+pod2usage(verbose => 2) if ($man);
+pod2usage(verbose => 0) if ($help);
+pod2usage(verbose => 0) unless (scalar(@ARGV));
+if ($reverse && $builddep) {
+  print(STDERR "E: Reverse build-dependencies are not supported\n");
+  exit 100;
+}
+
+# Tokenize the argument lists
+@follow = split(/,/,join(',',@follow));
+@show = split(/,/,join(',',@show  ));
+@statefollow = split(/,/,join(',',@statefollow));
+@stateshow = split(/,/,join(',',@stateshow  ));
+
+# Finish choosing the direction of our recursive dependencies
+my $PkgReference;
+if ($reverse) {
+  $PkgReference = 'ParentPkg';
+}
+else {
+  $PkgReference = 'TargetPkg';
+}
+
+# Redirect AptPkg's little ditty so it doesn't go into our files
+open(OLDOUT, ">&STDOUT");
+open(STDOUT, ">&STDERR");
+select(STDERR); $| = 1;
+
+# Initialise AptPkg's interface.
+use AptPkg::Config '$_config';
+use AptPkg::System '$_system';
+use AptPkg::Source;
+use AptPkg::Cache;
+use AptPkg::Source;
+$_config->init();
+$_system = $_config->system();
+
+# Choose whether we're searching Depends or Build-Depends.
+my $cache = AptPkg::Cache->new();
+my $source;
+if ($builddep) {
+  $source = AptPkg::Source->new();
+}
+
+# Restore the redirects.
+close(STDOUT);
+open(STDOUT, ">&OLDOUT");
+close(OLDOUT);
+select(STDOUT); $| = 0;
+
+# Set defaults if they weren't defined on the command line.
+if ($builddep) {
+  @follow = ("Build-Depends", "Build-Depends-Indep") unless (@follow);
+  @show = ("Build-Depends", "Build-Depends-Indep") unless (@show);
+}
+else {
+  @follow = (AptPkg::Dep::Depends, AptPkg::Dep::PreDepends) unless (@follow);
+  @show = (AptPkg::Dep::Depends, AptPkg::Dep::PreDepends) unless (@show);
+}
+my %deptype_dict;
+
+@statefollow = ("NotInstalled",
+		"UnPacked",
+		"HalfConfigured",
+		"HalfInstalled",
+		"ConfigFiles",
+		"Installed")
+  unless (@statefollow);
+@stateshow = ("NotInstalled",
+	      "UnPacked",
+	      "HalfConfigured",
+	      "HalfInstalled",
+	      "ConfigFiles",
+	      "Installed")
+  unless (@stateshow);
+
+# We will track all the packages we have ever seen in this hash.
+# Therefore, we will never duplicate the display of an entry.
+my %seen;
+
+sub print_depcompareop {
+  my $depcompareop = shift(@_);
+
+  if ($depcompareop == AptPkg::Dep::Or) {
+    return "|";
+  }
+  if ($depcompareop == AptPkg::Dep::NoOp) {
+    return "";
+  }
+  if ($depcompareop == AptPkg::Dep::LessEq) {
+    return "<=";
+  }
+  if ($depcompareop == AptPkg::Dep::GreaterEq) {
+    return ">=";
+  }
+  if ($depcompareop == AptPkg::Dep::Less) {
+    return "<<";
+  }
+  if ($depcompareop == AptPkg::Dep::Greater) {
+    return ">>";
+  }
+  if ($depcompareop == AptPkg::Dep::Equals) {
+    return "=";
+  }
+  if ($depcompareop == AptPkg::Dep::NotEquals) {
+    return "!=";
+  }
+}
+
+sub get_depends {
+  my $pkg = shift(@_);
+  my $reverse = shift(@_);
+
+  # Resolve the package by name.
+  my $p;
+  if ($builddep) {
+    unless ($p = $source->get($pkg)) {
+      warn "W: Unable to locate package $pkg\n";
+      return;
+    }
+  }
+  else {
+    unless ($p = $cache->get($pkg)) {
+      warn "W: Unable to locate package $pkg\n";
+      return;
+    }
+  }
+
+  # Which way do our dependencies go?  Reverse, or forward.  Notice
+  # how we get the last version for our forward dependencies.
+  if ($reverse) {
+    return $p->{RevDependsList};
+  }
+  elsif ($builddep) {
+    if (my $i = pop(@$p)) {
+      return $i->{BuildDepends};
+    }
+  }
+  else {
+    if (my $i = $p->{VersionList}) {
+      if (my $j = pop(@$i)) {
+	return $j->{DependsList};
+      }
+    }
+  }
+}
+
+sub print_package {
+  my $pkg = shift(@_);
+  my $results = shift(@_);
+
+  $Print->{node}->($pkg, "box");
+
+  # Display the list of dependencies
+  for my $deptype (sort keys %$results) {
+    # Should we show this?
+    if (grep {$deptype eq $_} @show
+	or grep {$deptype_dict{$deptype} eq lc($_)} @show) {
+      for my $parent (sort keys %{$$results{$deptype}}) {
+	# Capture the state and ensure we only show the things requested.
+	my $version = $$results{$deptype}{$parent}[0];
+	my $state = $$results{$deptype}{$parent}[1];
+	my $dep = $$results{$deptype}{$parent}[2];
+	if (grep {$state eq $_} @stateshow) {
+	  $Print->{edge}->($parent, $pkg, $deptype, $dep, $version,
+			   ($printstate ? $state : undef));
+	}
+      }
+    }
+  }
+}
+
+sub file_depends {
+  my $results = shift(@_);
+  my $deps = shift(@_);
+
+  for my $dep (@$deps) {
+    # Figure out the version.
+    my $version = ($reverse
+		   ? $dep->{ParentVer}->{VerStr}
+		   : $dep->{TargetVer});
+    if ($version) {
+      $version = ($dep->{CompTypeDeb}
+		  ? $dep->{CompTypeDeb} . " "
+		  : "") . $version;
+    }
+    # Figure out the current state.
+    my $state = ($reverse
+		 ? $dep->{ParentPkg}->{CurrentState}
+		 : $dep->{TargetPkg}->{CurrentState});
+    # Push the name of this package into the right pigeonhole.
+    $$results{0+$dep->{DepType}}{$dep->{$PkgReference}->{Name}} =
+      [ $version, $state, "$dep->{DepType}"];
+    # Populate the dictionaries of names for this lcoale
+    $deptype_dict{0+$dep->{DepType}} = lc("$dep->{DepType}");
+  }
+}
+
+sub file_builddepends {
+  my $results = shift(@_);
+  my $deps = shift(@_);
+
+  # Build-Depends are keyed by dependency type
+  for my $deptype (keys %$deps) {
+    # There is a list of packages within each
+    for my $pkgs ($$deps{$deptype}) {
+      # Each package may have a version
+      for my $pkg (@$pkgs) {
+	my $version = $pkg->[2];
+	if ($version) {
+	  $version = ($pkg->[1]
+		      ? print_depcompareop($pkg->[1]) . " "
+		      : "") . $version;
+	}
+	my $p = $cache->get($pkg->[0]);
+	my $state = "Unknown";
+	$state = $cache->get($pkg->[0])->{CurrentState} if ($p);
+	# Push the name of this package into the right pigeonhole.
+	$$results{$deptype}{$pkg->[0]} = [ $version, $state, "$deptype" ];
+	$deptype_dict{$deptype} = lc($deptype);
+      }
+    }
+  }
+}
+
+sub show_rdepends {
+  for my $pkg (@_) {
+    # Only recurse if we have never seen this package before
+    unless ($seen{$pkg}) {
+      $seen{$pkg} = 1;
+
+      # Get the dependencies for this $pkg
+      my $deps = get_depends($pkg, $reverse);
+
+      # If there are no dependencies, at least print out a node.
+      unless ($deps) {
+	$Print->{node}->($pkg, "ellipse");
+	next;
+      }
+
+      # %results stores results for each category of dependency (Conflicts,
+      # Depends, Replaces, Suggests)
+      my %results;
+      if ($builddep) {
+	file_builddepends(\%results, $deps);
+      }
+      else {
+	file_depends(\%results, $deps);
+      }
+
+      # Display the information we have gathered about this package.
+      print_package($pkg, \%results);
+
+      # Recurse through the packages mentioned as dependencies.
+      for my $deptype (sort keys %results) {
+	# Here, we filter the types of dependencies to follow.
+	if (grep {$deptype eq $_} @follow) {
+	  show_rdepends (
+			 grep {
+			   my $state = $results{$deptype}{$_}[1];
+			   grep {
+			     $state eq $_
+			     } @statefollow
+			   } sort keys %{$results{$deptype}}
+			 );
+	  # I feel the need to explain this hairy double grep argument.
+	  # We need to pass an array of package names to show_rdepends,
+	  # which will recursively follow them for further processing.
+	  # However, we want to filter this list so that we have the
+	  # inner join of @statefollow and the state of each package.
+	  # Hence, the double grep.
+	}
+      }
+
+    }
+  }
+}
+
+sub print_version {
+  print("apt-rdepends $version\n");
+  print("Written by Simon Law.\n");
+  print("\n");
+  print("Copyright (C) 2002-2005  Simon Law\n");
+  print("This is free software; see the source for copying conditions.");
+  print("  There is NO\nwarranty; not even for MERCHANTABILITY or");
+  print(" FITNESS FOR A PARTICULAR PURPOSE.\n\n");
+  exit 3;
+}
+
+# This factory returns the correct functions
+sub print_factory ($) {
+  my $type = shift(@_);
+
+  ## Headers for the output
+  # print_header();
+  my $print_header;
+
+  ## Footers for the output
+  # print_footer();
+  my $print_footer;
+
+  ## Display the name of the package.
+  # print_node($pkg, $shape);
+  # $pkg   => The name of the node to print.
+  # $shape => The shape of the node, if necessary.
+  my $print_node;
+
+  ## Display the edges, which express the dependencies.
+  # print_edge($parent, $pkg, $deptype, $depdesc, $version, $state);
+  # $parent  => Parent node
+  # $pkg     => Self node
+  # $deptype => Dependency type
+  # $depdesc => Dependency description
+  # $version => Version number, if it exists
+  # $state   => State, if it exists
+  my $print_edge;
+
+  # DOTTY
+  if ($type eq "dotty") {
+    $print_header = sub {
+      print("digraph packages {\n");
+      print("concentrate=true;\n");
+      print("size=\"30,40\";\n");
+    };
+    $print_footer = sub {
+      print("}\n");
+    };
+
+    $print_node = sub {
+      my ($pkg, $shape) = @_;
+      print("\"$pkg\" [shape=$shape];\n");
+    };
+
+    $print_edge = sub {
+      my ($parent, $pkg, $deptype, $depdesc, $version, $state) = @_;
+
+      my $target = $parent;
+      $target .= " ($version)" if defined($version);
+      $target .= " [$state]" if defined($state);
+
+      if ($reverse) {
+	print("\"$parent\" -> \"$pkg\"");
+      }
+      else {
+	print("\"$pkg\" -> \"$parent\"");
+      }
+
+      if ($deptype == AptPkg::Dep::Conflicts) {
+	print('[color=springgreen]');
+	last SPRING;
+      }
+      elsif ($deptype == AptPkg::Dep::Depends) {
+      }
+      elsif ($deptype == AptPkg::Dep::Suggests) {
+	print('[color=yellow]');
+      }
+      elsif ($deptype == AptPkg::Dep::Recommends) {
+	print('[color=orange]');
+      }
+      elsif ($deptype == AptPkg::Dep::Replaces) {
+	print('[color=red]');
+      }
+      elsif ($deptype == AptPkg::Dep::PreDepends) {
+	print('[color=blue]');
+      }
+      print(";\n");
+    }
+  }
+
+  # VCG
+  elsif ($type eq "vcg") {
+    $print_header = sub {
+      print("graph: { title: \"packages\"\n");
+      print("xmax: 700 ymax: 700 x: 30 y: 30\n");
+      print("layout_downfactor: 8\n");
+    };
+    $print_footer = sub {
+      print("}\n");
+    };
+
+    $print_node = sub {
+      my ($pkg, $shape) = @_;
+      print("node: { title: \"$pkg\" label: \"$pkg\" shape: $shape }\n");
+    };
+
+    $print_edge = sub {
+      my ($parent, $pkg, $deptype, $depdesc, $version, $state) = @_;
+
+      my $target = $parent;
+      $target .= " ($version)" if defined($version);
+      $target .= " [$state]" if defined($state);
+
+      print('edge: { ');
+      if ($reverse) {
+	print("sourcename: \"$parent\" targetname: \"$pkg\"");
+      } else {
+	print("sourcename: \"$pkg\" targetname: \"$parent\"");
+      }
+      print(' class: 2');
+      if ($deptype == AptPkg::Dep::Conflicts) {
+	print(' label: "conflicts" color: lightgreen');
+      }
+      elsif ($deptype == AptPkg::Dep::Depends) {
+      }
+      elsif ($deptype == AptPkg::Dep::Suggests) {
+	print(' label: "suggests" color: yellow');
+      }
+      elsif ($deptype == AptPkg::Dep::Recommends) {
+	print(' label: "recommends" color: orange');
+      }
+      elsif ($deptype == AptPkg::Dep::Replaces) {
+	print(' label: "replaces" color: red');
+      }
+      elsif ($deptype == AptPkg::Dep::PreDepends) {
+	print(' label: "predepends" color: blue');
+      }
+      print(" }\n");
+    }
+  }
+
+  # CONSOLE
+  else {
+    $print_header = sub {};
+    $print_footer = sub {};
+
+    $print_node = sub {
+      my ($pkg, $shape) = @_;
+      print("$pkg\n");
+    };
+
+    my $DirText = '';
+    $DirText = 'Reverse ' if ($reverse);
+    $print_edge = sub {
+      my ($parent, $pkg, $deptype, $depdesc, $version, $state) = @_;
+
+      print("  $DirText$depdesc: $parent");
+      print(" ($version)") if defined($version);
+      print(" [$state]") if defined($state);
+      print("\n");
+    };
+  }
+
+  return {
+	  header => $print_header,
+	  footer => $print_footer,
+	  node => $print_node,
+	  edge => $print_edge,
+	 };
+}
+
+# Main section
+$Print = print_factory($output);
+$Print->{header}->();
+show_rdepends(@ARGV);
+$Print->{footer}->();
+
+__END__
+
+=head1 NAME
+
+apt-rdepends - performs recursive dependency listings similar to apt-cache
+
+=head1 SYNOPSIS
+
+apt-rdepends [options] [I<pkgs> ...]
+
+=begin text
+
+Options:
+
+=over -1
+
+ -b, --build-depends        show build dependencies
+ -d, --dotty                generates a dotty graph
+ -p, --print-state          show the state of each dependency
+ -r, --reverse              list packages that depend on the specified one
+ -f, --follow=DEPENDS       only follow DEPENDS dependencies recursively
+ -s, --show=DEPENDS         only show DEPENDS dependencies
+     --state-follow=STATES  only follow STATES states recursively
+     --state-show=STATES    only show STATES states
+     --help                 display this help and exit
+     --man                  display the man page and exit
+     --version              output version information and exit
+
+=back
+
+=end text
+
+=head1 DESCRIPTION
+
+B<apt-rdepends> searches through the APT cache to find package
+dependencies.  B<apt-rdepends> knows how to emulate the result
+of calling B<apt-cache> with both I<depends> and I<dotty>
+options.
+
+By default, B<apt-rdepends> shows a listing of each dependency
+a package has.  It will also look at each of these fulfilling packages,
+and recursively lists their dependencies.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-b>, B<--build-depends>
+
+Show build dependencies instead of normal package dependencies.
+
+=item B<-d>, B<--dotty>
+
+dotty takes a list of packages on the command line and generates
+output suitable for use by springgraph.  The result will be a set of
+nodes and edges representing the relationships between the
+packages. By default the given packages will trace out all dependent
+packages which can produce a very large graph.
+
+Blue lines are pre-depends, green lines are conflicts, yellow lines
+are suggests, orange lines are recommends, red lines are replaces,
+and black lines are depends.
+
+Caution, dotty cannot graph larger sets of packages.
+
+=item B<-p>, B<--print-state>
+
+Shows the state of each dependency after each package version.
+See B<--state-follow> and B<--state-show> for why this is useful.
+
+=item B<-r>, B<--reverse>
+
+Shows the listings of each package that depends on a package.
+Furthermore, it will look at these dependent packages, and find their
+dependers.
+
+=item B<-f>, B<--follow=>I<DEPENDS>
+
+A comma-separated list of I<DEPENDS> types to follow recursively.
+By default, it only follows the I<Depends> and I<PreDepends> types.
+
+The possible values for I<DEPENDS> are: I<Depends>, I<PreDepends>,
+I<Suggests>, I<Recommends>, I<Conflicts>, I<Replaces>, and
+I<Obsoletes>.
+
+In B<--build-depends> mode, the possible values are: I<Build-Depends>,
+I<Build-Depends-Indep>, I<Build-Conflicts>, I<Build-Conflicts-Indep>.
+
+=item B<-s>, B<--show=>I<DEPENDS>
+
+A comma-separated list of I<DEPENDS> types to show, when displaying
+a listing.  By default, it only shows the I<Depends> and I<PreDepends> types.
+
+=item B<--state-follow=>I<STATES>
+
+=item B<--state-show=>I<STATES>
+
+These two options are similar to B<--follow> and B<--show>.  They both
+deal with the current state of a package.  By default, the value of
+I<STATES> is I<Unknown>, I<NotInstalled>, I<UnPacked>, I<HalfConfigured>,
+I<HalfInstalled>, I<ConfigFiles>, and I<Installed>.
+
+These options are useful, if you only want to only look at the
+dependencies between the I<Installed> packages on your system.  You
+can then call:
+
+=over 4
+
+apt-rdepends --state-follow=Installed libfoo
+
+=back
+
+Or if you want to only show the packages installed on your system:
+
+=over 4
+
+apt-rdepends --state-follow=Installed --state-show=Installed libfoo
+
+=back
+
+=item I<pkgs>
+
+The list of packages on which to discover dependencies.
+
+=item B<-v>, B<--vcg>, B<--xvcg>
+
+This option takes a list of packages on the command line and generates
+output suitable for use by xvcg.  The result will be a set of
+nodes and edges representing the relationships between the
+packages. By default the given packages will trace out all dependent
+packages which can produce a very large graph.
+
+Blue lines are pre-depends, green lines are conflicts, yellow lines
+are suggests, orange lines are recommends, red lines are replaces,
+and black lines are depends.
+
+=back
+
+=head1 SEE ALSO
+
+I<apt.conf>(5), I<sources.list>(5), B<apt-cache>(8), I<AptPkg>(3)
+
+=head1 BUGS
+
+B<apt-rdepends> does not emulate B<apt-cache> perfectly.  It does
+not display information about virtual packages, nor does it know about
+virtual packages when it is in reverse dependency mode.
+
+B<apt-rdepends> also does not know how to stop after a certain depth
+has been reached.
+
+B<apt-rdepends> cannot do reverse build-dependencies.  This is really
+difficult, since it would have to load the whole cache into memory
+before discovering which packages depend on others to build.
+
+B<apt-rdepends> exists.  This functionality should really reside in
+B<apt-cache> itself.
+
+=head1 AUTHOR
+
+B<apt-rdepends> was written by Simon Law <sfllaw@debian.org>
+
+=cut
+
+# Local Variables:
+# perl-continued-statement-offset:2
+# perl-indent-level:2
+# End:
+
+# vim: set ts=2 et sw=2 si:

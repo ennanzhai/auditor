@@ -1,0 +1,17 @@
+NEWS - list of user-visible changes between releases of apt-rdepends
+
+New in 1.3.0:
+* By default, dependencies will catch Depends and Pre-Depends, because
+  that's the expected semantic.
+* Now supports VCG output, with the --vcg option.
+
+New in 1.2.0:
+* Non-English locales work now!
+* You can now search for recursive build dependencies.
+
+New in 1.1.0:
+* You can now choose to see a dependency tree for only the packages
+  installed on your system.  Use the --state-show and --state-follow
+  options.
+* You can now see the current state of packages.  Use the --print-state
+  options.
