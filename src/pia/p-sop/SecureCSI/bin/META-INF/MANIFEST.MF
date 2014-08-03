@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Class-Path: lib/US_export_policy.jar lib/bcmail-jdk15-133.jar lib/bcpg
+ -jdk15-133.jar lib/bcprov-jdk15-133.jar lib/bctsp-jdk15-133.jar lib/c
+ ommons-lang-2.6-javadoc.jar lib/commons-lang-2.6.jar lib/local_policy
+ .jar
+Main-Class: com.puncsky.SecureCSI.SecureCSI
+
