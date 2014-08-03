@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<topo>
+	<Node id="1" ip="10.0.0.4" type="HP J8697A Switch 5406zl, revision K.15.10.0003, ROM K.15.28 (/ws/swbuildm/rel_irvine_qaoff/code/build/btm(swbuildm_rel_irvine_qaoff_rel_irvine)) (Formerly ProCurve)"/>
+	<Node id="2" ip="10.0.0.1" type="HP J8697A Switch 5406zl, revision K.15.10.0003, ROM K.15.28 (/ws/swbuildm/rel_irvine_qaoff/code/build/btm(swbuildm_rel_irvine_qaoff_rel_irvine)) (Formerly ProCurve)"/>
+	<Node id="3" ip="VcD_ac4a3f17d5f5" type="NA"/>
+	<Node id="4" ip="10.0.0.3" type="HP J8697A Switch 5406zl, revision K.15.10.0003, ROM K.15.28 (/ws/swbuildm/rel_irvine_qaoff/code/build/btm(swbuildm_rel_irvine_qaoff_rel_irvine)) (Formerly ProCurve)"/>
+	<Link src="10.0.0.1" dst="10.0.0.3">
+	<Link src="10.0.0.1" dst="VcD_ac4a3f17d5f5">
+	<Link src="10.0.0.3" dst="10.0.0.4">
+</topo>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<topo>
+	<Node id="1" ip="10.0.0.1" type="core"/>
+	<Node id="2" ip="10.0.0.2" type="core"/>
+	<Node id="3" ip="10.0.0.3" type="agg"/>
+	<Node id="4" ip="10.0.0.4" type="agg"/>
+	<Node id="5" ip="10.0.0.5" type="agg"/>
+	<Node id="6" ip="10.0.0.6" type="agg"/>
+	<Node id="7" ip="10.0.0.7" type="tor"/>
+	<Node id="8" ip="10.0.0.8" type="tor"/>
+	<Node id="9" ip="10.0.0.9" type="tor"/>
+	<Node id="10" ip="10.0.0.10" type="tor"/>
+	<Link src="1" dst="3"/>
+	<Link src="1" dst="4"/>
+	<Link src="1" dst="5"/>
+	<Link src="1" dst="6"/>
+	<Link src="2" dst="3"/>
+	<Link src="2" dst="4"/>
+	<Link src="2" dst="5"/>
+	<Link src="2" dst="6"/>
+	<Link src="3" dst="7"/>
+	<Link src="3" dst="8"/>
+	<Link src="4" dst="7"/>
+	<Link src="4" dst="8"/>
+	<Link src="5" dst="9"/>
+	<Link src="5" dst="10"/>
+	<Link src="6" dst="9"/>
+	<Link src="6" dst="10"/>
+</topo>
